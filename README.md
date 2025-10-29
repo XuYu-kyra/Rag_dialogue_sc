@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 # sunce_chat
+=======
+# Rag_dialogue_sc
+>>>>>>> b6b75ea (chore: init project with README)
 
 一个基于 Flask 的简易对话与语音演示项目，包含：
 - Web 前端页面（`templates/index.html` + `static/`）
@@ -89,6 +93,41 @@ python app.py
 
 ---
 
+<<<<<<< HEAD
+=======
+### 本仓库实际展示（TTS 音频）
+
+<audio controls>
+  <source src="sunce_chat/static/audio/sunce_1744476113_b6a7f359.wav" type="audio/wav" />
+  Your browser does not support the audio element.
+</audio>
+
+[下载/试听（sunce_1744476113_b6a7f359.wav）](sunce_chat/static/audio/sunce_1744476113_b6a7f359.wav)
+
+---
+
+   
+### 本仓库实际展示
+- 预览 GIF：
+
+![项目预览 - 45s 到 53s 片段](sunce_chat/static/images/demo.gif)
+
+- 仓库内视频直链（建议用浏览器直接下载/观看）：
+
+[下载/观看 MP4（demo.mp4）](sunce_chat/static/demo.mp4)
+
+生成 GIF（本地有 ffmpeg 的示例命令）：
+```powershell
+# 先将 mp4 转为 10fps 的中间帧
+ffmpeg -i demo.mp4 -vf "fps=10,scale=800:-1:flags=lanczos" -y frames_%04d.png
+# 合成为 gif（简单方式）
+ffmpeg -i frames_%04d.png -vf "palettegen=stats_mode=full" -y palette.png
+ffmpeg -i frames_%04d.png -i palette.png -lavfi "paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" -y demo.gif
+```
+
+---
+
+>>>>>>> b6b75ea (chore: init project with README)
 ## 常见问题
 - 端口被占用：修改 `app.py` 中的端口，或结束占用该端口的进程。
 - 依赖安装失败：升级 pip 或单独安装有问题的包。

@@ -119,7 +119,6 @@ ffmpeg -i frames_%04d.png -i palette.png -lavfi "paletteuse=dither=bayer:bayer_s
 
 ---
 
->>>>>>> b6b75ea (chore: init project with README)
 ## 常见问题
 - 端口被占用：修改 `app.py` 中的端口，或结束占用该端口的进程。
 - 依赖安装失败：升级 pip 或单独安装有问题的包。

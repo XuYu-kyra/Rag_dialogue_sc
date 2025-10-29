@@ -2,7 +2,6 @@
 # sunce_chat
 =======
 # Rag_dialogue_sc
->>>>>>> b6b75ea (chore: init project with README)
 
 一个基于 Flask 的简易对话与语音演示项目，包含：
 - Web 前端页面（`templates/index.html` + `static/`）
@@ -97,10 +96,6 @@ python app.py
 =======
 ### 本仓库实际展示（TTS 音频）
 
-<audio controls>
-  <source src="sunce_chat/static/audio/sunce_1744476113_b6a7f359.wav" type="audio/wav" />
-  Your browser does not support the audio element.
-</audio>
 
 [下载/试听（sunce_1744476113_b6a7f359.wav）](sunce_chat/static/audio/sunce_1744476113_b6a7f359.wav)
 
@@ -108,13 +103,10 @@ python app.py
 
    
 ### 本仓库实际展示
-- 预览 GIF：
-
-![项目预览 - 45s 到 53s 片段](sunce_chat/static/images/demo.gif)
 
 - 仓库内视频直链（建议用浏览器直接下载/观看）：
 
-[下载/观看 MP4（demo.mp4）](sunce_chat/static/demo.mp4)
+[下载/观看 MP4（demo.mp4）](sunce_chat/static/final.mp4)
 
 生成 GIF（本地有 ffmpeg 的示例命令）：
 ```powershell

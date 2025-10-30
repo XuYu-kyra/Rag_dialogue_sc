@@ -97,7 +97,7 @@ python app.py
 ### 本仓库实际展示（TTS 音频）
 
 
-[下载/试听（sunce_1744476113_b6a7f359.wav）](sunce_chat/static/audio/sunce_1744476113_b6a7f359.wav)
+[下载/试听（sunce_1744476113_b6a7f359.wav）](static/audio/sunce_1744476113_b6a7f359.wav)
 
 ---
 
@@ -106,7 +106,7 @@ python app.py
 
 - 仓库内视频直链（建议用浏览器直接下载/观看）：
 
-[下载/观看 MP4（demo.mp4）](sunce_chat/static/final.mp4)
+[下载/观看 MP4（demo.mp4）](static/final.mp4)
 
 生成 GIF（本地有 ffmpeg 的示例命令）：
 ```powershell

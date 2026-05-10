@@ -1,155 +1,131 @@
-<<<<<<< HEAD
-# sunce_chat
-=======
-# Rag_dialogue_sc
+# RAG Dialogue System for Historical Character Interaction
 
-一个基于 Flask 的简易对话与语音演示项目，包含：
-- Web 前端页面（`templates/index.html` + `static/`）
-- 后端服务（`app.py`）
-- 第三方服务客户端封装（`api/`：如大模型、TTS、向量库等）
+This project is a Flask-based prototype for a dialogue and speech demo centered on a historical character. It combines a web interface, backend orchestration, large language model calls, text-to-speech generation, and vector retrieval components.
 
-适合作为本地原型与演示：文本/语音问答、调用外部大模型与语音合成服务等。
+The repository is intended as a local prototype and demonstration environment for:
+- text and speech question answering
+- retrieval-augmented generation workflows
+- integration with external LLM, TTS, and vector database services
 
----
+## Project Structure
 
-## 目录结构
-```
+```text
 sunce_chat/
-├─ app.py                # Flask 入口
-├─ api/                  # 外部服务客户端（LLM、TTS、向量库等）
+├─ app.py                # Flask entry point
+├─ api/                  # External service clients (LLM, TTS, vector DB)
 │  ├─ config.py
 │  ├─ deepseek_client.py
 │  ├─ tts_client.py
 │  └─ weaviate_client.py
 ├─ templates/
-│  └─ index.html         # 前端页面模板
+│  └─ index.html         # Front-end page template
 ├─ static/
 │  ├─ css/style.css
 │  ├─ js/chat.js
-│  └─ audio/             # 生成的音频文件
-├─ requirements.txt      # 依赖
+│  └─ audio/             # Generated audio files
+├─ requirements.txt
 └─ README.md
 ```
 
----
+## Features
 
-## 快速开始（Windows）
+- Web-based chat interface built with Flask
+- Role-oriented dialogue generation for a historical character
+- External large language model integration
+- Text-to-speech generation for spoken responses
+- Vector database support for retrieval-augmented responses
 
-### 1) 准备环境
-- 安装 Python 3.9+（建议 3.10/3.11）
-- 安装 Git（用于推送到 GitHub，可选）
+## Getting Started
 
-### 2) 进入项目
-如果你已经在本地有本项目，可直接进入目录：
-```powershell
-cd .\sunce_chat
+### 1. Prepare the environment
+
+- Python 3.9 or later is recommended
+- Git is optional but useful for version control
+
+### 2. Create and activate a virtual environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
 ```
 
-### 3) 创建并激活虚拟环境
+On Windows PowerShell:
+
 ```powershell
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
-如果执行策略限制导致无法激活，可先运行：
-```powershell
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
 
-### 4) 安装依赖
-```powershell
+### 3. Install dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-> 如需 CUDA/音频相关依赖，请根据你的硬件/驱动在安装前设置好环境。
+### 4. Run the project
 
-### 5) 运行项目
-```powershell
+```bash
 python app.py
 ```
-默认会在 `http://127.0.0.1:5000` 启动。打开浏览器访问即可。
 
----
+By default, the application starts at `http://127.0.0.1:5000`.
 
-## 配置说明
-部分外部服务（如大模型、TTS、向量数据库）需要 API Key 或连接信息。请查看并按需修改：
+## Configuration
+
+Some external services require API keys or connection settings. Review and adjust these files as needed:
+
 - `api/config.py`
 - `api/deepseek_client.py`
 - `api/tts_client.py`
 - `api/weaviate_client.py`
 
-常见做法：
-- 使用环境变量存放敏感信息（API Key、URL 等）
-- 在 PowerShell 中设置环境变量（示例）：
-```powershell
-$env:DEEPSEEK_API_KEY = "your_api_key_here"
-$env:TTS_API_KEY = "your_tts_key_here"
-$env:WEAVIATE_ENDPOINT = "http://localhost:8080"
-```
-然后运行：
-```powershell
+A common approach is to use environment variables for sensitive information.
+
+Example:
+
+```bash
+export DEEPSEEK_API_KEY="your_api_key_here"
+export TTS_API_KEY="your_tts_key_here"
+export WEAVIATE_ENDPOINT="http://localhost:8080"
 python app.py
 ```
 
----
+## Demo Assets
 
-<<<<<<< HEAD
-=======
-### 本仓库实际展示（TTS 音频）
+- Audio example: `static/audio/`
+- Video demo: `static/final.mp4`
 
+If you want to create a GIF preview locally, you can use `ffmpeg`:
 
-[下载/试听（sunce_1744476113_b6a7f359.wav）](static/audio/sunce_1744476113_b6a7f359.wav)
-
----
-
-   
-### 本仓库实际展示
-
-- 仓库内视频直链（建议用浏览器直接下载/观看）：
-
-[下载/观看 MP4（demo.mp4）](static/final.mp4)
-
-生成 GIF（本地有 ffmpeg 的示例命令）：
-```powershell
-# 先将 mp4 转为 10fps 的中间帧
+```bash
 ffmpeg -i demo.mp4 -vf "fps=10,scale=800:-1:flags=lanczos" -y frames_%04d.png
-# 合成为 gif（简单方式）
 ffmpeg -i frames_%04d.png -vf "palettegen=stats_mode=full" -y palette.png
 ffmpeg -i frames_%04d.png -i palette.png -lavfi "paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" -y demo.gif
 ```
 
----
+## Common Issues
 
-## 常见问题
-- 端口被占用：修改 `app.py` 中的端口，或结束占用该端口的进程。
-- 依赖安装失败：升级 pip 或单独安装有问题的包。
-```powershell
-python -m pip install --upgrade pip
-```
-- 无法播放音频：检查 `static/audio/` 是否有生成的音频文件，浏览器控制台是否报错。
+- Port already in use: change the port in `app.py` or stop the conflicting process
+- Dependency installation fails: upgrade `pip` and retry
+- Audio playback fails: check whether generated audio files exist in `static/audio/`
 
----
+## Development Notes
 
-## 开发建议
-- 建议添加 `.gitignore`（忽略 `.venv/`、`__pycache__/`、`*.pyc`、`static/audio/*.wav` 等大文件或临时文件）。
-- 将密钥放环境变量，不要提交到仓库。
+- Add a `.gitignore` to exclude `.venv/`, `__pycache__/`, `*.pyc`, and generated audio files
+- Store API keys in environment variables instead of committing them
 
-示例 `.gitignore` 片段：
-```
-# Python
+Example `.gitignore` snippet:
+
+```gitignore
 .venv/
 __pycache__/
 *.pyc
-
-# Audio cache
 static/audio/*.wav
-
-# OS / IDE
 .DS_Store
 .vscode/
 .idea/
 ```
 
----
+## License
 
-## 许可证
-未指定许可证时默认保留所有权利。若需开源，请添加合适的 `LICENSE` 文件（如 MIT、Apache-2.0）。
+No license is currently specified. If you plan to open-source this project, add an appropriate `LICENSE` file such as MIT or Apache-2.0.

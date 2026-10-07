@@ -2,31 +2,56 @@
 
 [English](#english) · [中文](#中文)
 
+**Tech stack:** Python · Flask · Weaviate · SentenceTransformers · DeepSeek API · GPT-SoVITS-compatible TTS · HTML/CSS/JavaScript
+
+![Local dialogue prototype](IMG_9810.JPG)
+
 ## English
 
-This Flask prototype lets a user chat with a historically grounded “Sun Ce” character. It combines multilingual semantic retrieval, prompt-controlled generation, short conversation memory, and text-to-speech so that the result feels like an interactive character rather than a raw question-answer endpoint.
+This prototype turns a source-grounded question into an in-character Sun Ce response and optional speech. The product goal is to keep historical role-play engaging without letting generation bypass the available source material.
 
-### The story
-
-Historical role-play has two competing requirements: the answer should be engaging, but it should not drift away from the available sources. I designed the request path so retrieval happens before generation. The model receives ranked source snippets and speaker metadata, while the prompt anchors identity, tone, and rules for uncertainty.
-
-### What I built
-
-- A Flask web UI and JSON API with `/api/chat` and `/api/tts` endpoints.
-- A Weaviate semantic-search client using `paraphrase-multilingual-MiniLM-L12-v2` embeddings and top-k retrieval from the `SunCeDocs` collection.
-- A DeepSeek client with a role-specific prompt, source context, and up to five turns of in-memory conversation history.
-- A TTS adapter that writes generated audio into the configured static audio directory and serves it back to the browser.
-- A simple front end for text interaction and audio playback, plus local demo assets for explaining the system.
-
-### Request flow
+### User flow
 
 ```text
-question -> multilingual embedding -> Weaviate top-k sources
-         -> identity/style/grounding prompt -> DeepSeek response
-         -> optional TTS -> browser playback
+user question
+  -> multilingual embedding
+  -> top-k retrieval from Weaviate / SunCeDocs
+  -> source snippets + speaker metadata + role rules
+  -> DeepSeek response
+  -> optional TTS audio -> browser playback
 ```
 
-### Quick start
+### What I implemented
+
+- A Flask web interface and JSON endpoints at `/api/chat` and `/api/tts`.
+- Multilingual embeddings with `paraphrase-multilingual-MiniLM-L12-v2` and near-vector retrieval from the `SunCeDocs` collection.
+- Prompt assembly that combines retrieved text, source/speaker metadata, identity constraints, style rules, and up to five turns of in-process history.
+- A DeepSeek client using the OpenAI-compatible API.
+- A TTS adapter for a local GPT-SoVITS-compatible endpoint, with generated audio served from Flask's static directory.
+- Browser interaction for text chat and audio playback, plus the checked-in local demonstration image above.
+
+### Configuration
+
+No live API credential is stored in the current source. Runtime-specific values are read from environment variables; [`.env.example`](.env.example) documents the names but is not loaded automatically.
+
+| Variable | Required | Purpose |
+| --- | --- | --- |
+| `DEEPSEEK_API_KEY` | Yes for chat | DeepSeek authentication |
+| `WEAVIATE_HTTP_HOST`, `WEAVIATE_HTTP_PORT` | For retrieval | Weaviate endpoint |
+| `WEAVIATE_API_KEY` | Depends on local setup | Weaviate authentication |
+| `TTS_API_URL`, `TTS_REF_AUDIO_PATH` | Only for speech | Local TTS service and reference audio |
+
+PowerShell example:
+
+```powershell
+$env:DEEPSEEK_API_KEY = 'replace-with-your-key'
+$env:WEAVIATE_HTTP_HOST = '127.0.0.1'
+python app.py
+```
+
+Before starting Flask, the Weaviate instance must contain the expected `SunCeDocs` collection. TTS is optional; its local service and reference audio are not bundled here.
+
+### Run locally
 
 ```bash
 python -m venv .venv
@@ -36,40 +61,39 @@ pip install -r requirements.txt
 python app.py
 ```
 
-The app listens on `http://127.0.0.1:5000` by default. Configure API keys, Weaviate connection details, TTS endpoint, and audio paths in `api/config.py` or, preferably, through environment-backed configuration before deployment.
+The default address is `http://127.0.0.1:5000`.
 
-### Engineering trade-offs and limits
+### Current evidence and limits
 
-The prototype keeps conversation history in process memory and uses a synchronous local request path for predictable demos. Retrieval quality depends on the indexed corpus, and role-play output is not a substitute for historical scholarship. A production version would add persistent sessions, timeouts/retries, source citations in the UI, secret management, content moderation, and evaluation for groundedness and latency.
+The repository demonstrates the end-to-end request path and UI, but it does not contain a retrieval-quality or latency benchmark. Conversation history is process-local and shared by the running process; retrieval quality depends on the indexed corpus; generated role-play is not a substitute for historical scholarship. Production work would require persistent per-user sessions, request timeouts/retries, source citations in the UI, moderation, and groundedness/latency evaluation.
+
+Any DeepSeek key that appeared in earlier public commits should be revoked and replaced even though the current file no longer contains it.
 
 ## 中文
 
-这是一个 Flask 历史人物对话原型：用户可以与“孙策”角色聊天，系统先从 Weaviate 中检索相关史料，再把史料片段、说话人信息、身份设定和短期对话历史交给 DeepSeek 生成，最后可选地调用 TTS 播放语音。
+这是一个带史料检索的历史人物对话原型。用户提出问题后，系统先从 `SunCeDocs` 中找到相关文本，再把史料片段、来源/说话人信息、身份约束和短期对话历史交给 DeepSeek，生成“孙策”口吻的回答；如果本地 TTS 服务可用，还可以继续生成语音。
 
-### 项目故事
+### 产品链路
 
-历史角色扮演同时要求“有趣”和“不能脱离史料”。因此我把检索放在生成之前：每次请求先用多语句向量找到 `SunCeDocs` 中的相关文本，再通过 prompt 约束身份、语气、白话表达和不确定信息的处理方式，而不是让模型无依据地自由发挥。
+这个项目要平衡两件事：角色回答需要有互动感，但生成模型不能绕过已有史料自由发挥。因此检索发生在生成之前，prompt 同时承担身份、表达风格和不确定信息处理规则。
 
-### 我的工作
+### 我的实现
 
-- 使用 Flask 搭建网页和 JSON API，提供 `/api/chat` 与 `/api/tts`；
-- 使用 `paraphrase-multilingual-MiniLM-L12-v2` 生成 embedding，并通过 Weaviate 做 top-k 语义检索；
-- 封装 DeepSeek 调用，组织史料上下文、身份锚定、风格规则和最多五轮进程内对话历史；
-- 封装 TTS 接口，把生成的音频写入静态目录并返回浏览器播放；
-- 组织前端聊天、音频播放和演示素材，形成从问题到语音回答的完整链路。
+- 用 Flask 搭建页面和 `/api/chat`、`/api/tts` JSON 接口；
+- 使用 `paraphrase-multilingual-MiniLM-L12-v2` 生成多语 embedding，并在 Weaviate 中做 top-k 向量检索；
+- 组合检索文本、来源/说话人信息、身份约束、风格规则和最多五轮进程内历史；
+- 通过 OpenAI-compatible API 封装 DeepSeek 调用；
+- 对接本地 GPT-SoVITS-compatible TTS 服务，把音频写入静态目录并返回浏览器播放；
+- 完成文本聊天、音频播放和本地演示页面。
 
-### 快速运行
+### 配置与运行
 
-```bash
-python -m venv .venv
-# Windows PowerShell
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-python app.py
-```
+当前源码不再保存真实 API key；所有机器相关配置都从环境变量读取，[`.env.example`](.env.example) 只用于说明变量名，不会被程序自动加载。聊天需要 `DEEPSEEK_API_KEY`，检索前需要准备包含 `SunCeDocs` 的 Weaviate 实例；TTS 服务和参考音频是可选的，也不包含在仓库中。
 
-默认地址是 `http://127.0.0.1:5000`。部署前请配置 DeepSeek、Weaviate 和 TTS 的凭据与地址，推荐使用环境变量而不是把密钥写入代码。
+按上面的虚拟环境命令安装依赖并运行 `python app.py`，默认地址为 `http://127.0.0.1:5000`。
 
-### 边界与下一步
+### 当前边界
 
-当前版本把对话历史保存在进程内，适合本地演示；检索质量依赖索引语料，角色回答也不能替代历史研究。产品化还需要持久化会话、超时重试、界面引用来源、密钥管理、内容安全和 groundedness/延迟评测。
+仓库已经展示端到端请求链路和界面，但还没有 retrieval quality 或 latency benchmark。对话历史保存在进程内，检索效果取决于索引语料，角色输出也不能替代历史研究。后续产品化需要按用户持久化会话、超时重试、界面来源引用、内容安全和 groundedness/延迟评测。
+
+历史公开提交中出现过的 DeepSeek key 即使已从当前文件删除，也必须在服务端撤销并重新生成。

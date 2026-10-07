@@ -1,11 +1,12 @@
 from openai import OpenAI
 from .config import DEEPSEEK_CONFIG
 
-# 连接DeepSeek API
-deepseek_client = OpenAI(
-    api_key=DEEPSEEK_CONFIG['api_key'],
-    base_url=DEEPSEEK_CONFIG['base_url']
-)
+
+def _get_deepseek_client():
+    api_key = DEEPSEEK_CONFIG['api_key']
+    if not api_key:
+        raise RuntimeError('DEEPSEEK_API_KEY is not set')
+    return OpenAI(api_key=api_key, base_url=DEEPSEEK_CONFIG['base_url'])
 
 # 全局对话历史
 chat_history = []
@@ -77,6 +78,7 @@ def sunce_qa(question, retrieved_docs):
     ]
     
     # 让DeepSeek AI处理对话
+    deepseek_client = _get_deepseek_client()
     response = deepseek_client.chat.completions.create(
         model="deepseek-chat",
         messages=messages,
